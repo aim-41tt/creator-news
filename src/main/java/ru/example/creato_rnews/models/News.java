@@ -14,7 +14,9 @@ public class News {
 	private Long id;
 
 	private String title;
-
+	
+	private String team;
+	
 	private String description;
 
 	@OneToOne
@@ -29,9 +31,10 @@ public class News {
 	 * @param description
 	 * @param contentNews
 	 */
-	public News(Long id, String title, String description, ContentNews contentNews) {
+	public News(Long id, String title,String team, String description, ContentNews contentNews) {
 		this.id = id;
 		this.title = title;
+		this.team = team;
 		this.description = description;
 		this.contentNews = contentNews;
 	}
@@ -55,6 +58,20 @@ public class News {
 	 */
 	public String getTitle() {
 		return title;
+	}
+
+	/**
+	 * @return the team
+	 */
+	public String getTeam() {
+		return team;
+	}
+
+	/**
+	 * @param team the team to set
+	 */
+	public void setTeam(String team) {
+		this.team = team;
 	}
 
 	/**
