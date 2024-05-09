@@ -1,6 +1,7 @@
 package ru.example.creato_rnews.restController;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 
@@ -15,12 +16,10 @@ import ru.example.creato_rnews.repositorys.ContentNewsRepository;
 import ru.example.creato_rnews.repositorys.NewsRepository;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
-@RestController
-@RequestMapping(name = "/news")
+@RestController()
 public class CreateNewsController {
 
     @Autowired
@@ -31,43 +30,82 @@ public class CreateNewsController {
     private JsonService jsonService;
 
     @GetMapping("/all")
-    public CompletableFuture<String> getAllNews() {
+    public CompletableFuture<Object> getAllNews() {
         return CompletableFuture.supplyAsync(() -> {
             Iterable<News> news = newsRepo.findAll();
-            return jsonService.toJSON(news);
+            if (news.iterator().hasNext()) {
+                return jsonService.toJSON(news);
+            } else {
+                return jsonService.toJSON("No news available");
+            }
         });
     }
 
+
+
     @GetMapping("/{id}")
-    public CompletableFuture<String> getNewsById(@PathVariable Long id) {
+    public CompletableFuture<Object> getNewsById(@PathVariable Long id) {
         return CompletableFuture.supplyAsync(() -> {
-            return jsonService.toJSON(newsRepo.findById(id));
+            Optional<News> optionalNews = newsRepo.findById(id);
+            if (optionalNews.isPresent()) {
+                News news = optionalNews.get();
+                return jsonService.toJSON(news);
+            } else {
+                return jsonService.toJSON("News not found for id: " + id);
+            }
         });
     }
 
     @GetMapping("/random")
-    public CompletableFuture<String> getRandomNews() {
+    public CompletableFuture<Object> getRandomNews() {
         return CompletableFuture.supplyAsync(() -> {
-            Random random = new Random();
             List<News> newsList = (List<News>) newsRepo.findAll();
-            return jsonService.toJSON(newsList.get(random.nextInt(newsList.size())));
+            if (newsList.isEmpty()) {
+                return jsonService.toJSON("No news available");
+            } else {
+                Random random = new Random();
+                News randomNews = newsList.get(random.nextInt(newsList.size()));
+                return jsonService.toJSON(randomNews);
+            }
         });
     }
+
 
     @GetMapping("/newtoteame")
-    public CompletableFuture<List<News>> getNewToTeame(@RequestParam String Teame) {
+    public CompletableFuture<Object> getNewToTeame(@RequestParam String topic) {
         return CompletableFuture.supplyAsync(() -> {
-            return newsRepo.findByTeame(Teame);
+            List<News> newsList = newsRepo.findByTopic(topic);
+            if (newsList.isEmpty()) {
+                return jsonService.toJSON("No news found for team: " + topic);
+            } else {
+                return jsonService.toJSON(newsList);
+            }
         });
     }
 
+
     @PostMapping("/add")
-    public CompletableFuture<String> postAddNews(@RequestBody String json) {
+    public CompletableFuture<Object> postAddNews(@RequestBody String json) {
         return CompletableFuture.supplyAsync(() -> {
-            News news = jsonService.jsonToObject(json, News.class);
-            contentNewsRepo.save(news.getContentNews());
-            newsRepo.save(news);
-            return json;
+            if (json == null || json.isEmpty()) {
+                return jsonService.toJSON("Request body is empty");
+            }
+            
+            try {
+                News news = jsonService.jsonToObject(json, News.class).join();
+                if (news == null) {
+                    return jsonService.toJSON("Invalid JSON data");
+                }
+                contentNewsRepo.save(news.getContentNews());
+                newsRepo.save(news);
+                return jsonService.toJSON("News added successfully");
+            } catch (Exception e) {
+                e.printStackTrace();
+                return jsonService.toJSON("Failed to add news: " + e.getMessage());
+            }
         });
     }
+
+
+
 }

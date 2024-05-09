@@ -9,7 +9,6 @@ import ru.example.creato_rnews.models.News;
 
 
 public interface NewsRepository extends CrudRepository<News, Long>{
-	List<News> findByTitle (String title);
-	List<News> findByTeame (String teame);
-
+	List<News> findByTitle(String title);
+	List<News> findByTopic(String topic);
 }

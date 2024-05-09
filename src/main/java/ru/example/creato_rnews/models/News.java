@@ -15,7 +15,7 @@ public class News {
 
 	private String title;
 	
-	private String team;
+	private String topic;
 	
 	private String description;
 
@@ -28,13 +28,14 @@ public class News {
 	/**
 	 * @param id
 	 * @param title
+	 * @param topic
 	 * @param description
 	 * @param contentNews
 	 */
-	public News(Long id, String title,String team, String description, ContentNews contentNews) {
+	public News(Long id, String title,String topic, String description, ContentNews contentNews) {
 		this.id = id;
 		this.title = title;
-		this.team = team;
+		this.topic = topic;
 		this.description = description;
 		this.contentNews = contentNews;
 	}
@@ -61,17 +62,17 @@ public class News {
 	}
 
 	/**
-	 * @return the team
+	 * @return the topic
 	 */
-	public String getTeam() {
-		return team;
+	public String getTopic() {
+		return topic;
 	}
 
 	/**
-	 * @param team the team to set
+	 * @param team the topic to set
 	 */
-	public void setTeam(String team) {
-		this.team = team;
+	public void setTopic(String topic) {
+		this.topic = topic;
 	}
 
 	/**

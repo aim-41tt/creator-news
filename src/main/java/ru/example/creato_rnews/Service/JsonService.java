@@ -6,34 +6,38 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.concurrent.CompletableFuture;
+
 @Service
 public class JsonService {
 
-	private final ObjectMapper mapper = new ObjectMapper();
-	
-	@Async
-	public <T> String toJSON(T Object) {
-		String json = null;
+    private final ObjectMapper mapper = new ObjectMapper();
 
-		try {
-			json = mapper.writeValueAsString(Object);
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
-		return json;
-	}
-	
-	@Async
-	public <T> T jsonToObject(String json, Class<T> classObject) {
-		T Object = null;
+    @Async
+    public <T> CompletableFuture<String> toJSON(T object) {
+        CompletableFuture<String> future = new CompletableFuture<>();
 
-		try {
-			Object = mapper.readValue(json, classObject);
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		}
+        try {
+            String json = mapper.writeValueAsString(object);
+            future.complete(json);
+        } catch (JsonProcessingException e) {
+            future.completeExceptionally(e);
+        }
 
-		return Object;
-	}
+        return future;
+    }
 
+    @Async
+    public <T> CompletableFuture<T> jsonToObject(String json, Class<T> classObject) {
+        CompletableFuture<T> future = new CompletableFuture<>();
+
+        try {
+            T object = mapper.readValue(json, classObject);
+            future.complete(object);
+        } catch (JsonProcessingException e) {
+            future.completeExceptionally(e);
+        }
+
+        return future;
+    }
 }
