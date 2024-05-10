@@ -16,10 +16,12 @@ import ru.example.creato_rnews.repositorys.ContentNewsRepository;
 import ru.example.creato_rnews.repositorys.NewsRepository;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
-@RestController()
+@RestController
+@RequestMapping("/news/api")
 public class CreateNewsController {
 
     @Autowired
@@ -105,7 +107,5 @@ public class CreateNewsController {
             }
         });
     }
-
-
 
 }
